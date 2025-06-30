@@ -16,7 +16,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
-
+YOOKASSA_SHOP_ID = config('YOOKASSA_SHOP_ID')
+YOOKASSA_SECRET_KEY = config('YOOKASSA_SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
