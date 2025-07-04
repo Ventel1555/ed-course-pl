@@ -3,11 +3,17 @@ from users.models import User
 # Курс и его модули.
 
 class Course(models.Model):
+    LEVEL_CHOICES = (
+        ('beginner', 'Начальный'),
+        ('intermediate', 'Средний'),
+        ('advanced', 'Продвинутый'),
+    )
     title = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.CharField(max_length=100)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'})
+    category = models.CharField(max_length=100)  # Позже можно сделать отдельной моделью!!!
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, default='beginner')
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='courses')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -2,6 +2,12 @@
 
 A scalable online learning platform built with Django, designed for students, instructors, and administrators. The platform allows users to create, purchase, and take educational courses, with features like course management, payment integration, progress tracking, and reviews.
 
+## COMANDS FOR DEV:
+- docker-compose down
+- docker-compose up --build -d
+- docker-compose exec web python manage.py runserver
+- docker-compose exec web pip install -r requirements.txt
+
 ## Table of Contents
 - [Features](#features)
 - [Technologies](#technologies)
