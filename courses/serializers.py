@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Course
 from users.models import User
+from lessons.serializers import LessonSerializer
+from .models import Course, Module
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,3 +15,10 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'title', 'description', 'price', 'category', 'level', 'teacher', 'created_at', 'updated_at']
+
+class ModuleSerializer(serializers.ModelSerializer):
+    lessons = LessonSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Module
+        fields = ['id', 'title', 'order', 'lessons']

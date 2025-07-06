@@ -1,19 +1,23 @@
-from rest_framework import generics, viewsets
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from .models import Course
-from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import CourseSerializer
+from rest_framework.pagination import PageNumberPagination
 
-class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+class CourseListView(APIView):
+    def get(self, request):
+        courses = Course.objects.all()
+        paginator = PageNumberPagination()
+        paginated_courses = paginator.paginate_queryset(courses, request)
+        serializer = CourseSerializer(paginated_courses, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
-class CoursePagination(PageNumberPagination):
-    page_size = 10
-
-class CourseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Course.objects.all().select_related('teacher')
-    serializer_class = CourseSerializer
-    pagination_class = CoursePagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category', 'level', 'price']
+class CourseDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+            serializer = CourseSerializer(course)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
