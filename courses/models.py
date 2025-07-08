@@ -41,3 +41,12 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title}"
+
+class UserCourseProgress(models.Model):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_lessons = models.ManyToManyField('lessons.Lesson', blank=True)
+
+    class Meta:
+        unique_together = ['user', 'course']
