@@ -12,3 +12,4 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title} - {self.rating}"
+    

@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from users.serializers import UserSerializer
 from .models import Review
+from users.serializers import UserSerializer
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    student = UserSerializer(read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'user', 'rating', 'comment', 'created_at']
+        fields = ['id', 'student', 'rating', 'comment', 'created_at']
