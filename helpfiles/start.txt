@@ -1,0 +1,16 @@
+docker-compose down - Останови и удали контейнеры:
+
+docker volume rm edtech-platform_postgres_data - Удали том PostgreSQL (осторожно: это удалит данные базы):
+
+1. docker-compose up --build -d
+docker ps
+Пересобери и запусти контейнеры c проверкой статуса
+
+2. миграции: 
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
+
+docker-compose exec web pip list
+
+ОПДКЛЮЧЕНИЕ К БД:
+docker-compose exec db psql -U user -d edtech_platform
