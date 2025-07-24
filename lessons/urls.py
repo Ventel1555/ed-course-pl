@@ -1,12 +1,30 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from reviews.views import CourseReviewViewSet
-from lessons.views import LessonViewSet
+from django.urls import path
+from .views import LessonViewSet, LessonListHTMLView
+from reviews.views import CourseReviewViewSet, CourseReviewHTMLView
 
-router = DefaultRouter()
-router.register(r'courses/(?P<course_id>\d+)/reviews', CourseReviewViewSet, basename='course-reviews')
-router.register(r'lessons', LessonViewSet, basename='lessons')
+# LessonViewSet actions
+lesson_viewset = LessonViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+lesson_detail = LessonViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'delete': 'destroy'
+})
+
+# CourseReviewViewSet actions
+review_viewset = CourseReviewViewSet.as_view({
+    'get': 'list'
+})
 
 urlpatterns = [
-    path('', include(router.urls)),
+    # API endpoints
+    path('lessons/', lesson_viewset, name='lesson-list'),
+    path('lessons/<int:pk>/', lesson_detail, name='lesson-detail'),
+    path('courses/<int:course_id>/reviews/', review_viewset, name='course-reviews'),
+    
+    # HTML endpoints
+    path('lessons/list/', LessonListHTMLView.as_view(), name='lesson-list-html'),
+    path('courses/<int:course_id>/reviews/list/', CourseReviewHTMLView.as_view(), name='course-reviews-html'),
 ]

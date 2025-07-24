@@ -21,6 +21,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'title', 'description', 'price', 'category', 'level', 'teacher', 'created_at', 'updated_at', 'modules', 'reviews', 'first_lesson', 'is_started']
+        read_only_fields = ['teacher', 'created_at', 'updated_at']
 
     def get_first_lesson(self, obj):
         first_module = obj.modules.order_by('order').first()
@@ -35,3 +36,7 @@ class CourseSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             return UserCourseProgress.objects.filter(user=user, course=obj).exists()
         return False
+    
+    def create(self, validated_data):
+        validated_data['teacher'] = self.context['request'].user
+        return Course.objects.create(**validated_data)

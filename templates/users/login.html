@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
+    <title>Вход</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
@@ -15,26 +15,22 @@
 </head>
 <body>
     <div class="form-container" id="app">
-        <h2>Регистрация</h2>
+        <h2>Вход</h2>
         <div v-if="nonFieldErrors" class="error">{{ nonFieldErrors }}</div>
-        <form @submit.prevent="register">
+        <form @submit.prevent="login">
             <div class="form-group">
                 <label for="username">Имя пользователя</label>
                 <input v-model="form.username" id="username" class="form-control" required>
                 <div v-if="errors.username" class="error">{{ errors.username }}</div>
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
-                <input v-model="form.email" id="email" type="email" class="form-control" required>
-                <div v-if="errors.email" class="error">{{ errors.email }}</div>
-            </div>
-            <div class="form-group">
                 <label for="password">Пароль</label>
                 <input v-model="form.password" id="password" type="password" class="form-control" required>
                 <div v-if="errors.password" class="error">{{ errors.password }}</div>
             </div>
-            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-            <p class="mt-3">Уже есть аккаунт? <a href="/users/login/">Войти</a></p>
+            <button type="submit" class="btn btn-primary">Войти</button>
+            <p class="mt-3">Нет аккаунта? <a href="/users/register/">Зарегистрироваться</a></p>
+            <p class="mt-3"><a href="/users/logout/" class="btn btn-secondary">Выйти</a></p>
         </form>
     </div>
 
@@ -47,7 +43,6 @@
                 return {
                     form: {
                         username: '',
-                        email: '',
                         password: ''
                     },
                     errors: {}
@@ -59,30 +54,37 @@
                 }
             },
             methods: {
-                async register() {
+                async login() {
+                    const csrfToken = this.getCsrfToken();
+                    console.log('CSRF Token:', csrfToken);
+                    if (!csrfToken) {
+                        this.errors = { non_field_errors: ['CSRF-токен не найден. Попробуйте обновить страницу.'] };
+                        return;
+                    }
                     try {
-                        const response = await fetch('/users/api/register/', {
+                        console.log('Sending login request with:', this.form);
+                        const response = await fetch('/users/api/login/', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRFToken': this.getCsrfToken()
+                                'X-CSRFToken': csrfToken
                             },
                             body: JSON.stringify(this.form),
                             credentials: 'include'
                         });
+                        console.log('Response status:', response.status);
                         const data = await response.json();
-                        console.log('Response:', response);
-                        console.log('Data:', data);
+                        console.log('Response data:', data);
                         if (response.ok) {
                             this.errors = {};
                             console.log('Redirecting to /api/courses/list/');
-                            window.location.href = '/api/courses/list/';
+                            window.location.assign('/api/courses/list/');
                         } else {
-                            this.errors = data.errors || { non_field_errors: ['Ошибка регистрации'] };
+                            this.errors = data.errors || { non_field_errors: ['Ошибка входа: ' + (data.message || 'Неизвестная ошибка')] };
                         }
                     } catch (err) {
-                        console.log('Error:', err);
-                        this.errors = { non_field_errors: ['Ошибка сервера'] };
+                        console.log('Fetch error:', err);
+                        this.errors = { non_field_errors: ['Ошибка сервера: ' + err.message] };
                     }
                 },
                 getCsrfToken() {
